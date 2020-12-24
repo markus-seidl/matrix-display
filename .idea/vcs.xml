@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython/tools/Tecate-bitmap-fonts" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython/tools/adabot" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython/tools/bitmap_font" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython/tools/huffman" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython/tools/python-semver" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython/tools/uf2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/build_deps/circuitpython/tools/usb_descriptor" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython/tools/Tecate-bitmap-fonts" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython/tools/adabot" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython/tools/bitmap_font" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython/tools/huffman" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython/tools/python-semver" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython/tools/uf2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/circuitpython/lib/matriximagedecoder/build_deps/circuitpython/tools/usb_descriptor" vcs="Git" />
+  </component>
+</project>
