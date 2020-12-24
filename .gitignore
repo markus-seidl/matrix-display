@@ -89,6 +89,10 @@ pip-selfcheck.json
 # CUSTOM
 
 circuitpython/backup/secrets.py
+
+!circuitpython/lib/
 circuitpython/lib/build*
+circuitpython/lib/build*.zip
 circuitpython/lib/bundles
+
 
