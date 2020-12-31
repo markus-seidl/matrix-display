@@ -280,6 +280,9 @@ class MatrixImageDecoderFile(MatrixImageDecoderCommon):
 
         self._bitmap_buffer = None
         self._group = None
+
+        self._fps_sum = 0
+        self._fps_count = 0
         # self._brightness = 1.0
 
     def clear(self):
@@ -367,8 +370,10 @@ class MatrixImageDecoderFile(MatrixImageDecoderCommon):
         read = self._f.read(width * height)
         len_read = len(read)
 
-        for i in range(len_read):
-            bitmap[i] = read[i]
+        bitmap.fill_from(read)
+
+        # for i in range(len_read):
+        #    bitmap[i] = read[i]
 
         return bitmap
 
@@ -415,6 +420,15 @@ class MatrixImageDecoderFile(MatrixImageDecoderCommon):
         self._group = group
 
         # print("Took ", time.monotonic() - current_time, "s to decode and construct next frame")
+        self._fps_sum += time.monotonic() - current_time
+        self._fps_count += 1
+
+        if self._fps_count > 10:
+            d = self._fps_sum / float(self._fps_count)
+            #print("Took ", d, "s to decode and construct next frame")
+
+            self._fps_sum = 0.0
+            self._fps_count = 0
 
         self._display.show(group)
 
