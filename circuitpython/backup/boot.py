@@ -18,4 +18,4 @@ import storage
 #print("Switch state ", switch.value)
 
 # If the switch pin is connected to ground CircuitPython can write to the drive
-# storage.remount("/", True)
+storage.remount("/", True)

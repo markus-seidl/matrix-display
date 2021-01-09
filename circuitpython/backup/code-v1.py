@@ -15,7 +15,6 @@ import os
 import time
 import matrixserver
 import io
-
 # from microcontroller import watchdog
 # from watchdog import WatchDogMode
 #
@@ -23,7 +22,7 @@ import io
 # watchdog.mode = WatchDogMode.RESET
 # watchdog.feed()
 
-PANEL_SIZE = [64, 64]
+PANEL_SIZE = [128, 32]
 
 # import adafruit_display_text.label
 # from adafruit_display_shapes.rect import Rect
@@ -33,7 +32,7 @@ PANEL_SIZE = [64, 64]
 from adafruit_matrixportal.matrix import Matrix
 
 # --- Display setup ---
-matrix = Matrix(width=128, height=32)
+matrix = Matrix(width=PANEL_SIZE[0], height=PANEL_SIZE[1])
 display = matrix.display
 
 # https://cryptii.com/pipes/binary-to-base64
@@ -73,7 +72,7 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(
 
 """Use below for Most Boards"""
 status_light = neopixel.NeoPixel(
-    board.NEOPIXEL, 1, brightness=1.0
+    board.NEOPIXEL, 1, brightness=0.2
 )  # Uncomment for Most Boards
 """Uncomment below for ItsyBitsy M4"""
 # import adafruit_dotstar as dotstar
@@ -85,6 +84,11 @@ wifi.connect()
 
 
 class SimpleWSGIApplication:
+    """
+    An example of a simple WSGI Application that supports
+    basic route handling and static asset file serving for common file types
+    """
+
     def __init__(self):
         self._listeners = {}
         self._start_response = None
@@ -124,11 +128,47 @@ class SimpleWSGIApplication:
         """
         self._listeners[self._get_listener_key(method, path)] = request_handler
 
+    def serve_file(self, file_path, directory=None):
+        status = "200 OK"
+        headers = [("Content-Type", self._get_content_type(file_path))]
+
+        full_path = file_path if not directory else directory + file_path
+
+        def resp_iter():
+            with open(full_path, "rb") as file:
+                while True:
+                    chunk = file.read(self.CHUNK_SIZE)
+                    if chunk:
+                        yield chunk
+                    else:
+                        break
+
+        return (status, headers, resp_iter())
+
+    def _log_environ(self, environ):  # pylint: disable=no-self-use
+        print("environ map:")
+        for name, value in environ.items():
+            print(name, value)
+
     def _get_listener_key(self, method, path):  # pylint: disable=no-self-use
         return "{0}|{1}".format(method.lower(), path)
 
+    def _get_content_type(self, file):  # pylint: disable=no-self-use
+        ext = file.split(".")[-1]
+        if ext in ("html", "htm"):
+            return "text/html"
+        if ext == "js":
+            return "application/javascript"
+        if ext == "css":
+            return "text/css"
+        if ext in ("jpg", "jpeg"):
+            return "image/jpeg"
+        if ext == "png":
+            return "image/png"
+        return "text/plain"
 
-def request_set_image(environ):  # pylint: disable=unused-argument
+
+def request_update_image(environ):  # pylint: disable=unused-argument
     print("Beginning of request ", gc.mem_free())
     content_length = environ['content-length']
     if content_length <= 0:
@@ -153,7 +193,7 @@ def request_set_image(environ):  # pylint: disable=unused-argument
     else:
         image_decoder.switch_to_memory()
 
-        if content_length >= 20000:  # 20kb seems to be the limit when connected to usb
+        if content_length >= 30000:  # 20kb seems to be the limit when connected to usb
             print("413 - no content length available")
             return ("413 PAYLOAD TOO LARGE", [], [])
 
@@ -165,8 +205,9 @@ def request_set_image(environ):  # pylint: disable=unused-argument
 
             valid = image_decoder.set_image(memoryview(f.getvalue()), False)
 
-    gc.collect()
     print("End of request ", gc.mem_free())
+    gc.collect()
+    print("After collecting ", gc.mem_free())
 
     if valid:
         return ("200 OK", [], [])
@@ -188,25 +229,9 @@ def request_set_brightness(environ):
     return ("200 OK", [], [])
 
 
-def request_get_achieved_fps(environ):
-    return ("200 OK", [], [str(image_decoder.avg_display_draw_time())])
-
-
-def request_get_fs_writable(environ):
-    return ("200 OK", [], [str(FS_WRITABLE)])
-
-
-def request_get_memory(environ):
-    print(str(gc.mem_free()))
-    return ("200 OK", [], [str(gc.mem_free())])
-
-
 web_app = SimpleWSGIApplication()
-web_app.on("POST", "/rest/v1/image", request_set_image)
-web_app.on("POST", "/rest/v1/brightness", request_set_brightness)
-web_app.on("GET", "/rest/v1/debug/achieved_fps", request_get_achieved_fps)
-web_app.on("GET", "/rest/v1/debug/fs_writable", request_get_fs_writable)
-web_app.on("GET", "/rest/v1/debug/memory", request_get_memory)
+web_app.on("POST", "/ajax/ledcolor", request_update_image)
+web_app.on("POST", "/ajax/brightness", request_set_brightness)
 
 # Here we setup our server, passing in our web_app as the application
 matrixserver.set_interface(esp)

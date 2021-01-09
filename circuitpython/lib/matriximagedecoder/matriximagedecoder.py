@@ -84,6 +84,12 @@ class MatrixImageDecoder:
     def brightness(self):
         return self._memory_decoder.brightness()
 
+    def avg_display_draw_time(self):
+        if self._use_file:
+            return self._file_decoder.avg_display_draw_time()
+        else:
+            return self._memory_decoder.avg_display_draw_time()
+
 
 class MatrixImageDecoderCommon:
     def __init__(self):
@@ -97,6 +103,29 @@ class MatrixImageDecoderCommon:
 
     def brightness(self):
         return self._brightness
+
+    def _generate_group_128_32(self, tile_grid01, tile_grid02):
+        bottom_is_left = False
+        bottom_is_bottom = True
+
+        if bottom_is_bottom:
+            tile_grid01.x = 64
+            tile_grid01.transpose_xy = True
+
+            tile_grid02.flip_y = True
+            tile_grid02.flip_x = True
+            tile_grid02.transpose_xy = True
+
+        if bottom_is_left:
+            tile_grid01.x = 64
+            tile_grid01.flip_x = True
+            tile_grid02.flip_y = True
+
+        group = displayio.Group()
+        group.append(tile_grid01)
+        group.append(tile_grid02)
+
+        return group
 
     def _adjust_palette(self, palette):
         ret = []
@@ -152,12 +181,17 @@ class MatrixImageDecoderMemory(MatrixImageDecoderCommon):
         self._last_update = None
         self._display = display
 
+        self._fps_sum = 0
+        self._fps_count = 0
+
     def clear(self):
         self._palette = None
         self.image_bin = None
         self._frame_no = 0
         self._last_update = None
         self._fps = 1
+        self._fps_sum = 0
+        self._fps_count = 0
         gc.collect()
 
     def load_image(self, filename):
@@ -242,12 +276,27 @@ class MatrixImageDecoderMemory(MatrixImageDecoderCommon):
         palette = self.palette()
         bitmap = self.decode_frame(self._frame_no)
 
-        tile_grid = displayio.TileGrid(bitmap, pixel_shader=palette)
-        group = displayio.Group()
-        group.append(tile_grid)
+        tile_grid01 = displayio.TileGrid(bitmap, pixel_shader=palette)
+        tile_grid02 = displayio.TileGrid(bitmap, pixel_shader=palette)
+
+        group = self._generate_group_128_32(tile_grid01, tile_grid02)
+
+        self._group = group
         self._display.show(group)
 
+        self._fps_sum += time.monotonic() - current_time
+        self._fps_count += 1
+
+        if self._fps_count > 100:
+            self._fps_sum = 0.0
+            self._fps_count = 0
+
         self._frame_no += 1
+
+    def avg_display_draw_time(self):
+        if self._fps_count <= 0:
+            return 0.0
+        return self._fps_sum / float(self._fps_count)
 
 
 class MatrixImageDecoderFile(MatrixImageDecoderCommon):
@@ -283,7 +332,6 @@ class MatrixImageDecoderFile(MatrixImageDecoderCommon):
 
         self._fps_sum = 0
         self._fps_count = 0
-        # self._brightness = 1.0
 
     def clear(self):
         self._frame_no = 0
@@ -294,6 +342,8 @@ class MatrixImageDecoderFile(MatrixImageDecoderCommon):
         if self._f:
             self._f.close()
             self._f = None
+        self._fps_sum = 0
+        self._fps_count = 0
         gc.collect()
 
     def load_image(self, filename):
@@ -412,27 +462,27 @@ class MatrixImageDecoderFile(MatrixImageDecoderCommon):
         palette = self.palette()
         bitmap = self.load_frame(self._frame_no)
 
-        tile_grid = displayio.TileGrid(bitmap, pixel_shader=palette)
-        tile_grid.flip_y = True
-        tile_grid.transpose_xy = False
-        group = displayio.Group()
-        group.append(tile_grid)
-        self._group = group
+        tile_grid01 = displayio.TileGrid(bitmap, pixel_shader=palette)
+        tile_grid02 = displayio.TileGrid(bitmap, pixel_shader=palette)
 
-        # print("Took ", time.monotonic() - current_time, "s to decode and construct next frame")
+        group = self._generate_group_128_32(tile_grid01, tile_grid02)
+
+        self._group = group
+        self._display.show(group)
+
         self._fps_sum += time.monotonic() - current_time
         self._fps_count += 1
 
-        if self._fps_count > 10:
-            d = self._fps_sum / float(self._fps_count)
-            #print("Took ", d, "s to decode and construct next frame")
-
+        if self._fps_count > 100:
             self._fps_sum = 0.0
             self._fps_count = 0
 
-        self._display.show(group)
-
         self._frame_no += 1
+
+    def avg_display_draw_time(self):
+        if self._fps_count <= 0:
+            return 0.0
+        return self._fps_sum / float(self._fps_count)
 
 
 def rgb_to_hsv(r, g, b):

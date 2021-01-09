@@ -1,5 +1,2 @@
-Adafruit CircuitPython 6.1.0-beta.2 on 2020-12-03; Adafruit Matrix Portal M4 with samd51j19
+Adafruit CircuitPython 6.1.0-beta.2-165-gf226f4a23-dirty on 2020-12-31; Adafruit Matrix Portal M4 with samd51j19
 boot.py output:
-Traceback (most recent call last):
-  File "boot.py", line 21, in <module>
-RuntimeError: Cannot remount '/' when USB is active.
