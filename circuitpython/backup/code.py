@@ -40,6 +40,8 @@ display = matrix.display
 image_decoder = MatrixImageDecoder(display, PANEL_SIZE)
 image_decoder.switch_to_file()
 
+image_decoder.set_brightness(0.42)
+
 if 'latest.image' in os.listdir():
     image_decoder.load_image('/latest.image')
     image_decoder.update_display()
@@ -157,6 +159,7 @@ def request_set_image(environ):  # pylint: disable=unused-argument
             print("413 - no content length available")
             return ("413 PAYLOAD TOO LARGE", [], [])
 
+        gc.collect()
         with io.BytesIO() as f:
             client = environ['wsgi.input']
             for i in range(0, content_length, length):
@@ -197,7 +200,7 @@ def request_get_fs_writable(environ):
 
 
 def request_get_memory(environ):
-    print(str(gc.mem_free()))
+    gc.collect()
     return ("200 OK", [], [str(gc.mem_free())])
 
 
