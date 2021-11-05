@@ -135,7 +135,12 @@ if __name__ == '__main__':
     # piskel = load_piskel('example/color pattern clone-20201219-173220.piskel')
     # piskel = load_piskel('example/Megaman moving-20201220-062820.piskel')
     # piskel = load_piskel('example/snakes-20201222-165907.piskel')
-    piskel = load_piskel('example/frog-ganbatte-merged.piskel')
+    # piskel = load_piskel('example/frog-ganbatte-merged.piskel')
+    # piskel = load_piskel('example/n7.piskel')
+
+    # piskel = load_piskel('example/subnautica-1.piskel')  # https://www.reddit.com/r/PixelArt/comments/8zztr7/my_first_pixel_art_a_custom_subnautica_icon_32x32/
+    # piskel = load_piskel('example/subnautica-2.piskel')  # https://www.reddit.com/r/subnautica/comments/hx0h4g/no_spoilers_i_made_a_lifepod_5_pixel_art/
+    piskel = load_piskel('example/subnautica-3.piskel')  # https://www.reddit.com/r/PixelArt/comments/hdzzwt/subnautica_pixel_fish_1_peeper/
 
     # piskel.width = 64
     # piskel.height = 64
