@@ -8,6 +8,12 @@ from graphics_mock import Movie, Graphics as GraphicsMock
 class Graphics(GraphicsMock):
     def __init__(self):
         options = RGBMatrixOptions()
+        options.rows = 32
+        options.cols = 64
+        options.chain_length = 2
+        options.pixel_mapper_config = "U-mapper"
+        options.hardware_mapping = "adafruit-hat"
+        options.gpio_slowdown = 4
         self.matrix = RGBMatrix(options=options)
 
     def convert_to_canvas(self, b64_images: list):
