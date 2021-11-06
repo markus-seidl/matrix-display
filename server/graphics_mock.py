@@ -10,7 +10,7 @@ class Movie:
 
 
 class Graphics:
-    def __init__(self):
+    def __init__(self, brightness: int):
         pass
 
     def read_payload(self, payload: dict) -> Movie:
@@ -30,6 +30,8 @@ class Graphics:
 
         return canvass
 
-    def display_canvas(self, canvas, brightness: int):
+    def set_brightness(self, brightness: int):
         pass
 
+    def display_canvas(self, canvas):
+        pass

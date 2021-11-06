@@ -6,7 +6,11 @@ from graphics_mock import Movie, Graphics as GraphicsMock
 
 
 class Graphics(GraphicsMock):
-    def __init__(self):
+    def __init__(self, brightness: int):
+        self.brightness = brightness
+        self._do_init()
+
+    def _do_init(self):
         options = RGBMatrixOptions()
         options.rows = 32
         options.cols = 64
@@ -14,7 +18,7 @@ class Graphics(GraphicsMock):
         options.pixel_mapper_config = "U-mapper"
         options.hardware_mapping = "adafruit-hat"
         options.gpio_slowdown = 4
-        options.brightness = 1
+        options.brightness = self.brightness
         self.matrix = RGBMatrix(options=options)
 
     def convert_to_canvas(self, b64_images: list):
@@ -35,7 +39,11 @@ class Graphics(GraphicsMock):
 
         return canvass
 
-    def display_canvas(self, canvas, brightness: int):
-        # canvas.brightness = brightness
-        self.matrix.brightness = brightness
-        self.matrix.SwapOnVSync(canvas)
+    def set_brightness(self, brightness: int):
+        self.brightness = brightness
+        self._do_init()
+
+    def display_canvas(self, canvas):
+        if self.matrix:
+            # This skips displaying this frame when the canvas is currently re-initialized (lazy-hack?)
+            self.matrix.SwapOnVSync(canvas)
