@@ -14,6 +14,7 @@ class Graphics(GraphicsMock):
         options.pixel_mapper_config = "U-mapper"
         options.hardware_mapping = "adafruit-hat"
         options.gpio_slowdown = 4
+        options.brightness = 1
         self.matrix = RGBMatrix(options=options)
 
     def convert_to_canvas(self, b64_images: list):
@@ -27,12 +28,14 @@ class Graphics(GraphicsMock):
                 pil_image = Image.open(f)
 
                 canvas = self.matrix.CreateFrameCanvas()
-                canvas.SetImage(pil_image)
+                pil_image = pil_image.convert('RGB')
+                canvas.SetImage(pil_image, unsafe=False)
 
                 canvass.append(canvas)
 
         return canvass
 
     def display_canvas(self, canvas, brightness: int):
-        canvas.brightness = brightness
+        # canvas.brightness = brightness
+        self.matrix.brightness = brightness
         self.matrix.SwapOnVSync(canvas)

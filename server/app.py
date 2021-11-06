@@ -1,6 +1,6 @@
 from flask import Flask, request
 from graphics_mock import Movie
-from graphics_mock import Graphics
+from graphics_rgb import Graphics
 import threading
 import time
 
@@ -15,26 +15,30 @@ BRIGHTNESS: int = 255
 def graphics_main():
     global CURRENT_MOVIE, NEXT_MOVIE, BRIGHTNESS
     frame = 0
-    while True:
-        switched_movie = False
-        if CURRENT_MOVIE is None and NEXT_MOVIE is None:
-            print("No movie loaded.")
-            time.sleep(1)
-            continue
-        elif CURRENT_MOVIE is None or NEXT_MOVIE is not None:
-            switched_movie = True
-            CURRENT_MOVIE = NEXT_MOVIE
-            NEXT_MOVIE = None
-
-        if switched_movie:
-            print(f"Displaying new Movie {len(CURRENT_MOVIE.canvass)} frames at {CURRENT_MOVIE.fps} fps")
-            frame = 0
-
-        GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame], BRIGHTNESS)
-        frame = min(frame + 1, len(CURRENT_MOVIE.canvass) - 1)
-
-        wait_time = min(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
-        time.sleep(wait_time)
+    try:
+        while True:
+            switched_movie = False
+            if CURRENT_MOVIE is None and NEXT_MOVIE is None:
+                print("No movie loaded.")
+                time.sleep(1)
+                continue
+            elif CURRENT_MOVIE is None or NEXT_MOVIE is not None:
+                switched_movie = True
+                CURRENT_MOVIE = NEXT_MOVIE
+                NEXT_MOVIE = None
+    
+            if switched_movie:
+                print(f"Displaying new Movie {len(CURRENT_MOVIE.canvass)} frames at {CURRENT_MOVIE.fps} fps")
+                frame = 0
+    
+            GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame], BRIGHTNESS)
+            # frame = min(frame + 1, len(CURRENT_MOVIE.canvass) - 1)
+            frame = (frame + 1) % ( len(CURRENT_MOVIE.canvass) - 1 )
+    
+            wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
+            time.sleep(wait_time)
+    except:
+        print("Exit.")
 
 
 # web_app.on("POST", "/rest/v1/image", request_set_image)
