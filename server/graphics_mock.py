@@ -17,12 +17,14 @@ class Movie:
         for b64_image in data['frames']:
             base64_png = str(b64_image)
             png = binascii.a2b_base64(base64_png)
-            with io.BytesIO() as f:
-                f.write(png)
-                f.seek(0)
-                pil_image = Image.open(f)
 
-                images.append(pil_image)
+            # Keep the file descriptor open
+            f = io.BytesIO()
+            f.write(png)
+            f.seek(0)
+            pil_image = Image.open(f)
+
+            images.append(pil_image)
 
         return Movie(fps, images)
 

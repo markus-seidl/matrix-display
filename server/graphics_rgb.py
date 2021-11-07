@@ -42,4 +42,4 @@ class Graphics(GraphicsMock):
         self.matrix.SwapOnVSync(canvas)
 
     def clear(self):
-        self.matrix.clear()
+        self.matrix.Clear()
