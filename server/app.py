@@ -90,8 +90,9 @@ def graphics_main():
 def set_image():
     global NEXT_MOVIE
     payload = request.json
-    NEXT_MOVIE = Movie.load_from_dict(payload)
-    NEXT_MOVIE.canvass = GLOBAL_GRAPHICS.convert_to_canvas(NEXT_MOVIE.frames)
+    temp = Movie.load_from_dict(payload)
+    temp.canvass = GLOBAL_GRAPHICS.convert_to_canvas(temp.frames)
+    NEXT_MOVIE = temp
 
     return {
         'frames': len(NEXT_MOVIE.canvass),
