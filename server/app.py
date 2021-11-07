@@ -1,9 +1,12 @@
+import math
+
 from flask import Flask, request
 from graphics_mock import Movie
 from graphics_rgb import Graphics
 import threading
 import time
 import traceback
+from timeit import default_timer as timer
 
 app = Flask(__name__)
 
@@ -12,9 +15,19 @@ GLOBAL_GRAPHICS = Graphics(BRIGHTNESS)
 CURRENT_MOVIE: Movie = None
 NEXT_MOVIE: Movie = None
 
+EXECUTION_TIME_SUM = 0
+EXECUTION_TIME_COUNT = 0
+ACHIEVED_FPS = -1
+
+
+def clear_frame_timing():
+    global EXECUTION_TIME_COUNT, EXECUTION_TIME_SUM
+    EXECUTION_TIME_COUNT = 0
+    EXECUTION_TIME_SUM = 0
+
 
 def graphics_main():
-    global CURRENT_MOVIE, NEXT_MOVIE, BRIGHTNESS
+    global CURRENT_MOVIE, NEXT_MOVIE, BRIGHTNESS, EXECUTION_TIME_COUNT, EXECUTION_TIME_SUM, ACHIEVED_FPS
     frame = 0
     exceptions = 0
     try:
@@ -32,14 +45,27 @@ def graphics_main():
                 if switched_movie:
                     print(f"Displaying new Movie {len(CURRENT_MOVIE.canvass)} frames at {CURRENT_MOVIE.fps} fps")
                     frame = 0
+                    clear_frame_timing()
+                    ACHIEVED_FPS = -1
 
+                start = timer()
                 GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame])
                 if len(CURRENT_MOVIE.canvass) > 1:
                     frame = (frame + 1) % (len(CURRENT_MOVIE.canvass) - 1)
                     wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
                 else:
-                    frame = 1
+                    frame = 0
                     wait_time = 1.0 / 60.0
+                end = timer()
+                diff = end - start
+                EXECUTION_TIME_SUM += diff
+                EXECUTION_TIME_COUNT += 1
+
+                if EXECUTION_TIME_SUM >= 1:
+                    if EXECUTION_TIME_COUNT > 1:
+                        ACHIEVED_FPS = EXECUTION_TIME_SUM / EXECUTION_TIME_COUNT
+                    else:
+                        ACHIEVED_FPS = 0.0000001  # "eps"
 
                 time.sleep(wait_time)
             except Exception as e:
@@ -94,7 +120,10 @@ def set_brightness():
 
 @app.route('/rest/v1/debug')
 def get_debug():
-    return 'Server Works!'
+    global ACHIEVED_FPS
+    return {
+        'fps': ACHIEVED_FPS
+    }
 
 
 # TODO Start graphics thread
