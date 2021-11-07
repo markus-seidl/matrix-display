@@ -7,7 +7,7 @@ import traceback
 
 app = Flask(__name__)
 
-BRIGHTNESS: int = 50
+BRIGHTNESS: int = 20
 GLOBAL_GRAPHICS = Graphics(BRIGHTNESS)
 CURRENT_MOVIE: Movie = None
 NEXT_MOVIE: Movie = None
@@ -34,9 +34,13 @@ def graphics_main():
                     frame = 0
 
                 GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame])
-                frame = (frame + 1) % (len(CURRENT_MOVIE.canvass) - 1)
+                if len(CURRENT_MOVIE.canvass) > 1:
+                    frame = (frame + 1) % (len(CURRENT_MOVIE.canvass) - 1)
+                    wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
+                else:
+                    frame = 1
+                    wait_time = 1.0 / 60.0
 
-                wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
                 time.sleep(wait_time)
             except Exception as e:
                 if exceptions >= 4:
