@@ -15,19 +15,19 @@ GLOBAL_GRAPHICS = Graphics(BRIGHTNESS)
 CURRENT_MOVIE: Movie = None
 NEXT_MOVIE: Movie = None
 
-EXECUTION_TIME_SUM = 0
+EXECUTION_TIME_START = 0
 EXECUTION_TIME_COUNT = 0
 ACHIEVED_FPS = -1
 
 
 def clear_frame_timing():
-    global EXECUTION_TIME_COUNT, EXECUTION_TIME_SUM
+    global EXECUTION_TIME_COUNT, EXECUTION_TIME_START
+    EXECUTION_TIME_START = 0
     EXECUTION_TIME_COUNT = 0
-    EXECUTION_TIME_SUM = 0
 
 
 def graphics_main():
-    global CURRENT_MOVIE, NEXT_MOVIE, BRIGHTNESS, EXECUTION_TIME_COUNT, EXECUTION_TIME_SUM, ACHIEVED_FPS
+    global CURRENT_MOVIE, NEXT_MOVIE, BRIGHTNESS, EXECUTION_TIME_COUNT, EXECUTION_TIME_START, ACHIEVED_FPS
     frame = 0
     exceptions = 0
     try:
@@ -47,8 +47,8 @@ def graphics_main():
                     frame = 0
                     clear_frame_timing()
                     ACHIEVED_FPS = -1
+                    EXECUTION_TIME_START = timer()
 
-                start = timer()
                 GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame])
                 if len(CURRENT_MOVIE.canvass) > 1:
                     frame = (frame + 1) % (len(CURRENT_MOVIE.canvass) - 1)
@@ -57,13 +57,11 @@ def graphics_main():
                     frame = 0
                     wait_time = 1.0 / 60.0
                 end = timer()
-                diff = end - start
-                EXECUTION_TIME_SUM += diff
                 EXECUTION_TIME_COUNT += 1
 
-                if EXECUTION_TIME_SUM >= 1:
-                    if EXECUTION_TIME_COUNT > 1:
-                        ACHIEVED_FPS = EXECUTION_TIME_SUM / EXECUTION_TIME_COUNT
+                if end - EXECUTION_TIME_START >= 1:  # Have we measuring one second at least?
+                    if EXECUTION_TIME_COUNT > 1:  # Have we measured one frame at least?
+                        ACHIEVED_FPS = (end - EXECUTION_TIME_START) / EXECUTION_TIME_COUNT
                     else:
                         ACHIEVED_FPS = 0.0000001  # "eps"
 
@@ -122,8 +120,12 @@ def set_brightness():
 @app.route('/rest/v1/debug')
 def get_debug():
     global ACHIEVED_FPS
+    fps = -1
+    if ACHIEVED_FPS > 0 or ACHIEVED_FPS < 0:
+        fps = 1 / ACHIEVED_FPS
+
     return {
-        'fps': ACHIEVED_FPS
+        'fps': 1 / ACHIEVED_FPS
     }
 
 
