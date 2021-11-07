@@ -117,7 +117,7 @@ def set_brightness():
     }
 
 
-@app.route('/rest/v1/fps')
+@app.route('/rest/v1/fps', methods=['POST', 'GET'])
 def set_get_fps():
     global CURRENT_MOVIE
     if request.method == 'POST':
