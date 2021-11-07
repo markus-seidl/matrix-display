@@ -3,6 +3,7 @@ from graphics_mock import Movie
 from graphics_rgb import Graphics
 import threading
 import time
+import traceback
 
 app = Flask(__name__)
 
@@ -40,9 +41,10 @@ def graphics_main():
             except Exception as e:
                 if exceptions >= 4:
                     CURRENT_MOVIE = None
+                    GLOBAL_GRAPHICS.clear()
                 exceptions += 1
                 print("Exception: ")
-                print(e)
+                print(traceback.format_exc())
     finally:
         GLOBAL_GRAPHICS.clear()
         print("Finally")
