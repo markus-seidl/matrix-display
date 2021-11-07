@@ -7,6 +7,7 @@ import threading
 import time
 import traceback
 from timeit import default_timer as timer
+import os
 
 app = Flask(__name__)
 
@@ -18,6 +19,17 @@ NEXT_MOVIE: Movie = None
 EXECUTION_TIME_START = 0
 EXECUTION_TIME_COUNT = 0
 ACHIEVED_FPS = -1
+
+
+def swap_to_default_movie():
+    if not os.path.exists('default.movie'):
+        print("No default movie exists.")
+        return
+
+    with open('default.movie', 'r') as f:
+        temp = Movie.load_from_json(f.read())
+        temp.canvass = GLOBAL_GRAPHICS.convert_to_canvas(temp.frames)
+        NEXT_MOVIE = temp
 
 
 def clear_frame_timing():
@@ -153,6 +165,21 @@ def get_debug():
     return {
         'fps': 1 / ACHIEVED_FPS
     }
+
+
+@app.route('/rest/v1/default_movie', methods=['POST'])
+def store_default_movie():
+    # Sanity check data - do try to load it first
+    payload = request.json
+    temp = Movie.load_from_dict(payload)
+
+    with open('default.movie', 'w+') as f:
+        f.write(temp.save_to_json())
+
+
+@app.route('/rest/v1/default_movie', methods=['POST'])
+def load_default_movie():
+    swap_to_default_movie()
 
 
 # TODO Start graphics thread
