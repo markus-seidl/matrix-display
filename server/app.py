@@ -182,7 +182,7 @@ def load_default_movie():
     swap_to_default_movie()
 
 
-# TODO Start graphics thread
+swap_to_default_movie()
 
 g_thread = threading.Thread(target=graphics_main, daemon=True)
 g_thread.start()
