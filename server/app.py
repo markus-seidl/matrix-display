@@ -6,7 +6,7 @@ import time
 
 app = Flask(__name__)
 
-BRIGHTNESS: int = 255
+BRIGHTNESS: int = 50
 GLOBAL_GRAPHICS = Graphics(BRIGHTNESS)
 CURRENT_MOVIE: Movie = None
 NEXT_MOVIE: Movie = None
@@ -62,7 +62,7 @@ def set_image():
 def set_brightness():
     global BRIGHTNESS
     if request.method == 'POST':
-        temp = max(0, min(255, int(request.data)))
+        temp = max(0, min(100, int(request.data)))
         print(f"Set brightness to {temp}")
         BRIGHTNESS = temp
         GLOBAL_GRAPHICS.set_brightness(BRIGHTNESS)
