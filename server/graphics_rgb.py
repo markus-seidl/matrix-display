@@ -7,7 +7,7 @@ from graphics_mock import Movie, Graphics as GraphicsMock
 
 class Graphics(GraphicsMock):
     def __init__(self, brightness: int):
-        self.brightness = brightness
+        self.brightness = max(1, min(100, brightness))
         self._do_init()
 
     def _do_init(self):
@@ -41,9 +41,13 @@ class Graphics(GraphicsMock):
 
     def set_brightness(self, brightness: int):
         self.brightness = brightness
-        self._do_init()
+        self.matrix.brightness = brightness  # doesn't work
+        # causes segmentation fault self._do_init()
 
     def display_canvas(self, canvas):
-        if self.matrix:
-            # This skips displaying this frame when the canvas is currently re-initialized (lazy-hack?)
-            self.matrix.SwapOnVSync(canvas)
+        self.matrix.SwapOnVSync(canvas)
+
+    def clear(self):
+        self.matrix.clear()
+
+

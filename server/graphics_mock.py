@@ -35,3 +35,6 @@ class Graphics:
 
     def display_canvas(self, canvas):
         pass
+
+    def clear(self):
+        pass

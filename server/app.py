@@ -36,8 +36,12 @@ def graphics_main():
 
             wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
             time.sleep(wait_time)
-    except:
-        print("Exit.")
+    except Exception as e:
+        print("Exit: ")
+        print(e)
+    finally:
+        GLOBAL_GRAPHICS.clear()
+        print("Finally")
 
 
 # web_app.on("POST", "/rest/v1/image", request_set_image)
