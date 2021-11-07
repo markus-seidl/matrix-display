@@ -22,6 +22,7 @@ ACHIEVED_FPS = -1
 
 
 def swap_to_default_movie():
+    global NEXT_MOVIE
     if not os.path.exists('default.movie'):
         print("No default movie exists.")
         return
