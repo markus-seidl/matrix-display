@@ -117,6 +117,32 @@ def set_brightness():
     }
 
 
+@app.route('/rest/v1/fps')
+def set_get_fps():
+    global CURRENT_MOVIE
+    if request.method == 'POST':
+        temp = max(0, min(60, int(request.data)))
+        print(f"Set fps to {temp}")
+        if CURRENT_MOVIE:
+            CURRENT_MOVIE.fps = temp
+
+    fps = -1
+    if CURRENT_MOVIE:
+        fps = CURRENT_MOVIE.fps
+
+    return {
+        'fps': fps
+    }
+
+
+@app.route('/rest/v1/clear')
+def do_clear():
+    global CURRENT_MOVIE, GLOBAL_GRAPHICS
+    CURRENT_MOVIE = None
+    GLOBAL_GRAPHICS.clear()
+    return {}
+
+
 @app.route('/rest/v1/debug')
 def get_debug():
     global ACHIEVED_FPS
