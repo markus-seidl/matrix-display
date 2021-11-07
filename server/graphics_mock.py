@@ -8,6 +8,7 @@ class Movie:
     def __init__(self, fps: int, frames: list):
         self.fps = fps
         self.frames = frames
+        self.canvass = None
 
     @staticmethod
     def load_from_dict(data):

@@ -15,30 +15,34 @@ NEXT_MOVIE: Movie = None
 def graphics_main():
     global CURRENT_MOVIE, NEXT_MOVIE, BRIGHTNESS
     frame = 0
+    exceptions = 0
     try:
         while True:
-            switched_movie = False
-            if CURRENT_MOVIE is None and NEXT_MOVIE is None:
-                print("No movie loaded.")
-                time.sleep(1)
-                continue
-            elif CURRENT_MOVIE is None or NEXT_MOVIE is not None:
-                switched_movie = True
-                CURRENT_MOVIE = NEXT_MOVIE
-                NEXT_MOVIE = None
+            try:
+                switched_movie = False
+                if CURRENT_MOVIE is None and NEXT_MOVIE is None:
+                    time.sleep(0.5)
+                    continue
+                elif CURRENT_MOVIE is None or NEXT_MOVIE is not None:
+                    switched_movie = True
+                    CURRENT_MOVIE = NEXT_MOVIE
+                    NEXT_MOVIE = None
 
-            if switched_movie:
-                print(f"Displaying new Movie {len(CURRENT_MOVIE.canvass)} frames at {CURRENT_MOVIE.fps} fps")
-                frame = 0
+                if switched_movie:
+                    print(f"Displaying new Movie {len(CURRENT_MOVIE.canvass)} frames at {CURRENT_MOVIE.fps} fps")
+                    frame = 0
 
-            GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame])
-            frame = (frame + 1) % (len(CURRENT_MOVIE.canvass) - 1)
+                GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame])
+                frame = (frame + 1) % (len(CURRENT_MOVIE.canvass) - 1)
 
-            wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
-            time.sleep(wait_time)
-    except Exception as e:
-        print("Exit: ")
-        print(e)
+                wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
+                time.sleep(wait_time)
+            except Exception as e:
+                if exceptions >= 4:
+                    CURRENT_MOVIE = None
+                exceptions += 1
+                print("Exception: ")
+                print(e)
     finally:
         GLOBAL_GRAPHICS.clear()
         print("Finally")
