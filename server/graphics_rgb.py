@@ -21,19 +21,13 @@ class Graphics(GraphicsMock):
         options.brightness = self.brightness
         self.matrix = RGBMatrix(options=options)
 
-    def convert_to_canvas(self, b64_images: list):
+    def convert_to_canvas(self, frames: list) -> list:
         canvass = list()
-        for b64_image in b64_images:
-            base64_png = str(b64_image)
-            png = binascii.a2b_base64(base64_png)
+        for image in frames:
             with io.BytesIO() as f:
-                f.write(png)
-                f.seek(0)
-                pil_image = Image.open(f)
-
                 canvas = self.matrix.CreateFrameCanvas()
-                pil_image = pil_image.convert('RGB')
-                canvas.SetImage(pil_image, unsafe=False)
+                pil_image = image.convert('RGB')
+                canvas.SetImage(pil_image, unsafe=False)  # Unsafe is faster, but sometimes has segmentation faults
 
                 canvass.append(canvas)
 
@@ -41,7 +35,7 @@ class Graphics(GraphicsMock):
 
     def set_brightness(self, brightness: int):
         self.brightness = brightness
-        self.matrix.brightness = brightness  # doesn't work
+        self.matrix.brightness = brightness  # needs reloading of the movie to work
         # causes segmentation fault self._do_init()
 
     def display_canvas(self, canvas):
@@ -49,5 +43,3 @@ class Graphics(GraphicsMock):
 
     def clear(self):
         self.matrix.clear()
-
-

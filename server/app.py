@@ -54,7 +54,8 @@ def graphics_main():
 def set_image():
     global NEXT_MOVIE
     payload = request.json
-    NEXT_MOVIE = GLOBAL_GRAPHICS.read_payload(payload)
+    NEXT_MOVIE = Movie.load_from_dict(payload)
+    NEXT_MOVIE.canvass = GLOBAL_GRAPHICS.convert_to_canvas(NEXT_MOVIE.frames)
 
     return {
         'frames': len(NEXT_MOVIE.canvass),
@@ -64,12 +65,17 @@ def set_image():
 
 @app.route('/rest/v1/brightness', methods=['POST', 'GET'])
 def set_brightness():
-    global BRIGHTNESS
+    global BRIGHTNESS, CURRENT_MOVIE, NEXT_MOVIE
     if request.method == 'POST':
         temp = max(0, min(100, int(request.data)))
         print(f"Set brightness to {temp}")
         BRIGHTNESS = temp
         GLOBAL_GRAPHICS.set_brightness(BRIGHTNESS)
+
+        # Re-convert current movie
+        if CURRENT_MOVIE:
+            new_canvass = GLOBAL_GRAPHICS.convert_to_canvas(CURRENT_MOVIE.frames)
+            CURRENT_MOVIE.canvass = new_canvass
 
     return {
         'brightness': BRIGHTNESS
