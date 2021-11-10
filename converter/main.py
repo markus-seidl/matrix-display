@@ -31,5 +31,5 @@ def convert_directory(directory: str):
 
 
 if __name__ == '__main__':
-    convert_directory(directory="/Users/msei/Downloads/subnautica")
+    convert_directory(directory="/Users/msei/Downloads/ntt")
     # convert_directory(directory="/Users/msei/Downloads/frog-ganbatte-merged/")

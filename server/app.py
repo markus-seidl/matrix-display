@@ -62,7 +62,10 @@ def graphics_main():
                     ACHIEVED_FPS = -1
                     EXECUTION_TIME_START = timer()
 
-                GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame])
+                if len(CURRENT_MOVIE.canvass) > 1 or switched_movie:
+                    # Do not refresh on static images
+                    GLOBAL_GRAPHICS.display_canvas(CURRENT_MOVIE.canvass[frame])
+
                 if len(CURRENT_MOVIE.canvass) > 1:
                     frame = (frame + 1) % (len(CURRENT_MOVIE.canvass) - 1)
                     wait_time = max(1.0 / 60.0, 1.0 / float(CURRENT_MOVIE.fps) - 0.005)  # limit to 60fps
